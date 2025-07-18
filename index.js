@@ -23,9 +23,18 @@ function multiplyMatrices(matrix1, matrix2){
     } return output
 }
 
-function get_coordinates(angleA, angleB, phi, inner_radius, torus_radius){
+function getCoordinates(angleA, angleB, phi, theta, R1, R2){
     // This is derived by multiplying all rotation matrices and the original coordinates
-    return [[],
-    [],
-    []]
+    sinTheta = Math.sin(theta)
+    cosTheta = Math.cos(theta)
+    sinA = Math.sin(angleA)
+    cosA = Math.cos(angleA)
+    sinB = Math.sin(angleB)
+    cosB = Math.cos(angleB)
+    sinPhi = Math.sin(phi)
+    cosPhi = Math.cos(phi)
+    original_x = R2 + (R1 * cosTheta)
+    return [[original_x * ((cosB * cosPhi) + (sinA * sinB * sinPhi)) - (R1 * cosA * sinB * sinTheta)],
+    [original_x * ((cosPhi * sinB) - (cosB * sinA * sinPhi)) + (R1 * cosA * cosB * sinTheta)],
+    [cosA * original_x * sinPhi + (original_x * sinA)]]
 }
