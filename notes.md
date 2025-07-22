@@ -11,6 +11,10 @@
 * ϕ - Phi represents the angle of rotation along the Y-Axis
 * A - A represents the angle of rotation along the X-axis
 * B - B represents the angle of rotation along the Z-axis
+* K2 - distance of the donut to the viewer
+* L - Luminance
+* Surface normal - a vector that is perpendicular to a surface at a given point
+
 
 # Notes
 -basically use different ascii characters ('.,-~:;=!*#$@') to represent different levels of brightness
@@ -29,3 +33,9 @@
 # Rotation Matrices
 - Each rotation matrix takes in a point as an input and rotates it around a certain axis
 - For instance, if we rotate our point around the x-axis, our value for x remains constant while we rotate the y and z coordinates based on Phi
+- The final rotation matrix used in the code is derived by multiplying all generic rotation matrices for the x, y and z axis
+
+# Luminance
+* Light is placed above and behind the viewer => (0, 1, -1) 
+    -> This should be a normalized unit vector but it isnt
+* Luminance = y-z
