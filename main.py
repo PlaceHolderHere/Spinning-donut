@@ -5,7 +5,7 @@ import pygame
 SCREEN_HEIGHT: int = 800
 SCREEN_WIDTH: int = 800
 FPS: int = 30
-PIXEL_SIZE: int = 1
+PIXEL_SIZE: int = 10
 K1: float = 15
 K2: float = 1
 R1: float = 5
@@ -29,28 +29,35 @@ def generate_torus(r1: float, r2: float) -> list[list[float]]:
     phi_spacing: float = 0.03
     theta_spacing: float = 0.1
     output: list = []
-    while phi < math.pi * 2:
+    while phi <= math.pi * 2:
         theta: int = 0
-        while theta < math.pi * 2:
+        while theta <= math.pi * 2:
             output.append([
                 (r2 + r1 * math.cos(theta)) * math.cos(phi),
                 r1 * math.sin(theta),
-                -(r2 + r1 * math.cos(theta)) * math.sin(phi)
-            ])
+                -(r2 + r1 * math.cos(theta)) * math.sin(phi),
+                theta,
+                phi])
             theta += theta_spacing
         phi += phi_spacing
     return output
 
 
 def rotate_point(point: list[float], angle_a: float, angle_b: float) -> list[float]:
-    x, y, z = point
+    x, y, z, theta, phi = point
     sinA = math.sin(angle_a)
     cosA = math.cos(angle_a)
     sinB = math.sin(angle_b)
     cosB = math.cos(angle_b)
+    sinPhi = math.sin(phi)
+    cosPhi = math.cos(phi)
+    sinTheta = math.sin(theta)
+    cosTheta = math.cos(theta)
     return [x * cosB - sinB * (y * cosA - z * sinA),
             x * sinB + cosB * (y * cosA - z * sinA),
-            y * sinA + z * cosA]
+            y * sinA + z * cosA,
+            (cosPhi * cosTheta * sinB) - (cosA * cosTheta * sinPhi) - (sinA * sinTheta) + (
+            cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi))]
 
 
 torus: list[list[float]] = generate_torus(R1, R2)
@@ -78,10 +85,11 @@ while running:
 
     # DRAW TORUS
     for point_index, point in enumerate(torus):
-        x, y, z = rotate_point(point, angleA, angleB)
+        x, y, z, luminance = rotate_point(point, angleA, angleB)
+        luminance = int((luminance + 1.5) * (255/3))
         x = round(K1 * x / K2 + z)
         y = round(K1 * y / K2 + z)
-        pygame.draw.rect(win, (255, 255, 255), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))
+        pygame.draw.rect(win, (luminance, luminance, luminance), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))
 
     # DISPLAY UPDATE
     pygame.display.update()

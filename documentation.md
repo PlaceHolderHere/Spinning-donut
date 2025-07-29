@@ -7,7 +7,8 @@
   * This function uses the idea of "Solid of revolution", generating a circle for every iteration of phi and rotates it around the y-axis
   * OUTPUT
     * The function outputs the points for a torus of R2 radius and an inner radius of R1
-    * The output is a 2d array with each nested array representing the [x, y, z] coordinates of each point
+    * The output is a 2d array with each nested array representing the [x, y, z, θ, ϕ] coordinates of each point
+    * θ & ϕ are added for calculating Luminance later on
 
 * rotate_point(point, angleA, angleB):
   * INPUTS
@@ -18,4 +19,7 @@
   * The formula is derived by multiplying (x, y, z) with the x and z generic rotation matrices
   * OUTPUT
     * The output is a list of the same size and format of the input point
-    * [x, y, z]
+    * [x, y, z, Luminance]
+    * The Luminance value for each point is updated after each rotation
+* Post processing of luminance
+  * After calculating the luminance, before rendering we normalize the value so instead of ranging from -1.5 to 1.5, it instead ranges from 0 - 255.
