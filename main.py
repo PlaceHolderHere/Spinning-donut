@@ -2,39 +2,42 @@ import math
 import pygame
 
 # Constants
-SCREEN_HEIGHT = 800
-SCREEN_WIDTH = 800
-FPS = 30
-PIXEL_SIZE = 1
-K1 = 15
-K2 = 1
-R1 = 5
-R2 = 10
+SCREEN_HEIGHT: int = 800
+SCREEN_WIDTH: int = 800
+FPS: int = 30
+PIXEL_SIZE: int = 1
+K1: float = 15
+K2: float = 1
+R1: float = 5
+R2: float = 10
 
 # Pygame Init
 pygame.init()
 win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Variables
-running = True
+running: bool = True
 
 
-def generate_torus(r1, r2):
-    phi = 0
-    phi_spacing = 0.03
-    theta_spacing = 0.1
-    output = []
+def generate_torus(r1: float, r2: float) -> list[list[float]]:
+    phi: int = 0
+    phi_spacing: float = 0.03
+    theta_spacing: float = 0.1
+    output: list = []
     while phi < math.pi * 2:
-        theta = 0
+        theta: int = 0
         while theta < math.pi * 2:
-            output.append([(r2 + r1 * math.cos(theta)) * math.cos(phi), r1 * math.sin(theta),
-                           -(r2 + r1 * math.cos(theta)) * math.sin(phi)])
+            output.append([
+                (r2 + r1 * math.cos(theta)) * math.cos(phi),
+                r1 * math.sin(theta),
+                -(r2 + r1 * math.cos(theta)) * math.sin(phi)
+            ])
             theta += theta_spacing
         phi += phi_spacing
     return output
 
 
-torus = generate_torus(R1, R2)
+torus: list[list[float]] = generate_torus(R1, R2)
 while running:
     pygame.time.Clock().tick(FPS)
     for event in pygame.event.get():
