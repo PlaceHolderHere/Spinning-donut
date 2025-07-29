@@ -10,6 +10,8 @@ K1: float = 15
 K2: float = 1
 R1: float = 5
 R2: float = 10
+A_SPACING: float = 0.1
+B_SPACING: float = 0.1
 
 # Pygame Init
 pygame.init()
@@ -17,6 +19,8 @@ win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Variables
 running: bool = True
+angleA: float = 0
+angleB: float = 0
 
 
 def generate_torus(r1: float, r2: float) -> list[list[float]]:
@@ -37,6 +41,17 @@ def generate_torus(r1: float, r2: float) -> list[list[float]]:
     return output
 
 
+def rotate_point(point: list[float], angle_a: float, angle_b: float) -> list[float]:
+    x, y, z = point
+    sinA = math.sin(angle_a)
+    cosA = math.cos(angle_a)
+    sinB = math.sin(angle_b)
+    cosB = math.cos(angle_b)
+    return [x * cosB - sinB * (y * cosA - z * sinA),
+            x * sinB + cosB * (y * cosA - z * sinA),
+            y * sinA + z * cosA]
+
+
 torus: list[list[float]] = generate_torus(R1, R2)
 while running:
     pygame.time.Clock().tick(FPS)
@@ -47,9 +62,17 @@ while running:
     # WIN FILL
     win.fill((0, 0, 0))
 
+    # ROTATE ANGLE A & B
+    angleA += A_SPACING
+    angleB += B_SPACING
+    if angleA > 2 * math.pi:
+        angleA = 0
+    if angleB > 2 * math.pi:
+        angleB = 0
+
     # DRAW TORUS
     for point_index, point in enumerate(torus):
-        x, y, z = point
+        x, y, z = rotate_point(point, angleA, angleB)
         x = round(K1 * x / K2 + z)
         y = round(K1 * y / K2 + z)
         pygame.draw.rect(win, (255, 255, 255), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))

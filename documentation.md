@@ -8,3 +8,14 @@
   * OUTPUT
     * The function outputs the points for a torus of R2 radius and an inner radius of R1
     * The output is a 2d array with each nested array representing the [x, y, z] coordinates of each point
+
+* rotate_point(point, angleA, angleB):
+  * INPUTS
+    * point is a list of 3 coordinates [x, y, z]
+    * angleA is the rotation along the x-axis (refer to notes.md)
+    * angleB is the rotation along the z-axis (refer to notes.md)
+  * This function returns the new location of the point after being rotated by angleA and angleB
+  * The formula is derived by multiplying (x, y, z) with the x and z generic rotation matrices
+  * OUTPUT
+    * The output is a list of the same size and format of the input point
+    * [x, y, z]
