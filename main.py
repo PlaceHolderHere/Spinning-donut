@@ -21,6 +21,7 @@ win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 running: bool = True
 angleA: float = 0
 angleB: float = 0
+animated: bool = True
 
 
 def generate_torus(r1: float, r2: float) -> list[list[float]]:
@@ -59,16 +60,21 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                animated = not animated
+
     # WIN FILL
     win.fill((0, 0, 0))
 
     # ROTATE ANGLE A & B
-    angleA += A_SPACING
-    angleB += B_SPACING
-    if angleA > 2 * math.pi:
-        angleA = 0
-    if angleB > 2 * math.pi:
-        angleB = 0
+    if animated:
+        angleA += A_SPACING
+        angleB += B_SPACING
+        if angleA > 2 * math.pi:
+            angleA = 0
+        if angleB > 2 * math.pi:
+            angleB = 0
 
     # DRAW TORUS
     for point_index, point in enumerate(torus):
