@@ -60,7 +60,7 @@ def rotate_point(point: list[float], angle_a: float, angle_b: float) -> list[flo
             cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi))]
 
 
-def rotate_points(points, angle_a, angle_b):
+def rotate_points(points: list[list[float]], angle_a: [float], angle_b: [float]) -> list[list[float]]:
     output = []
     for point in points:
         output.append(rotate_point(point, angle_a, angle_b))
