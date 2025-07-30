@@ -60,6 +60,13 @@ def rotate_point(point: list[float], angle_a: float, angle_b: float) -> list[flo
             cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi))]
 
 
+def rotate_points(points, angle_a, angle_b):
+    output = []
+    for point in points:
+        output.append(rotate_point(point, angle_a, angle_b))
+    return output
+
+
 torus: list[list[float]] = generate_torus(R1, R2)
 while running:
     pygame.time.Clock().tick(FPS)
@@ -83,12 +90,13 @@ while running:
         if angleB > 2 * math.pi:
             angleB = 0
 
-    # DRAW TORUS
-    for point_index, point in enumerate(torus):
-        x, y, z, luminance = rotate_point(point, angleA, angleB)
-        luminance = int((luminance + 1.5) * (255/3))
-        x = round(K1 * x / K2 + z)
-        y = round(K1 * y / K2 + z)
+    rotated_torus = rotate_points(torus, angleA, angleB)
+    sorted_torus = sorted(rotated_torus, key=lambda item: item[2], reverse=True)
+    for point in sorted_torus:
+        x, y, z, luminance = point
+        x = K1 * x / K2 + z
+        y = K1 * y / K2 + z
+        luminance = (luminance + 1.5) * (255 / 3)
         pygame.draw.rect(win, (luminance, luminance, luminance), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))
 
     # DISPLAY UPDATE

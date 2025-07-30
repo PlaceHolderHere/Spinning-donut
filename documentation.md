@@ -21,5 +21,7 @@
     * The output is a list of the same size and format of the input point
     * [x, y, z, Luminance]
     * The Luminance value for each point is updated after each rotation
+* rotate_points(points, angleA, angleB):
+  * This is the same as rotate_point, except it takes a list of points instead of a single point and outputs a list of points
 * Post processing of luminance
   * After calculating the luminance, before rendering we normalize the value so instead of ranging from -1.5 to 1.5, it instead ranges from 0 - 255.
