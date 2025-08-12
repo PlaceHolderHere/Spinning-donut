@@ -12,6 +12,7 @@ R1: float = 5
 R2: float = 10
 A_SPACING: float = 0.1
 B_SPACING: float = 0.1
+COLOR: tuple[int, int, int] = (148, 87, 235)
 
 # Pygame Init
 pygame.init()
@@ -96,8 +97,11 @@ while running:
         x, y, z, luminance = point
         x = K1 * x / K2 + z
         y = K1 * y / K2 + z
-        luminance = (luminance + 1.5) * (255 / 3)
-        pygame.draw.rect(win, (luminance, luminance, luminance), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))
+        luminance += 1.5
+        r = luminance * (COLOR[0] / 3)
+        g = luminance * (COLOR[1] / 3)
+        b = luminance * (COLOR[2] / 3)
+        pygame.draw.rect(win, (r, g, b), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))
 
     # DISPLAY UPDATE
     pygame.display.update()
