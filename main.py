@@ -13,6 +13,26 @@ R2: float = 10
 A_SPACING: float = 0.1
 B_SPACING: float = 0.1
 COLOR: tuple[int, int, int] = (148, 87, 235)
+# color_counter = 0
+# color_index = 0
+# colors = [
+#     (255, 182, 193),
+#     (255, 209, 180),
+#     (255, 179, 128),
+#     (253, 253, 150),
+#     (119, 221, 119),
+#     (189, 252, 201),
+#     (174, 229, 238),
+#     (174, 198, 207),
+#     (230, 190, 255),
+#     (200, 162, 200),
+#     (179, 158, 181),
+#     (255, 160, 122),
+#     (245, 245, 220),
+#     (207, 207, 207),
+#     (255, 192, 203)
+# ]
+# COLOR = colors[color_index]
 
 # Pygame Init
 pygame.init()
@@ -22,7 +42,7 @@ win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 running: bool = True
 angleA: float = 0
 angleB: float = 0
-animated: bool = True
+animated: bool = False
 
 
 def generate_torus(r1: float, r2: float) -> list[list[float]]:
@@ -90,6 +110,16 @@ while running:
             angleA = 0
         if angleB > 2 * math.pi:
             angleB = 0
+
+        # color_counter += 1
+        # if color_counter > 10:
+        #     color_counter = 0
+        #     color_index += 1
+        #     if color_index > len(colors) - 1:
+        #         print("done!")
+        #         animated = False
+        #         color_index = 0
+        #     COLOR = colors[color_index]
 
     rotated_torus = rotate_points(torus, angleA, angleB)
     sorted_torus = sorted(rotated_torus, key=lambda item: item[2], reverse=True)
