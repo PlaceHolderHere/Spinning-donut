@@ -21,8 +21,18 @@
     * The output is a list of the same size and format of the input point
     * [x, y, z, Luminance]
     * The Luminance value for each point is updated after each rotation
+
 * rotate_points(points, angleA, angleB):
   * This is the same as rotate_point, except it takes a list of points instead of a single point and outputs a list of points
+  
+* render_shape(shape, color, x_offset, y_offset)
+  * INPUTS
+    * shape: list[list[float]]
+      * This input is most likely derived from the output of rotate_points or generate_torus. It is basically just a list of points with coordinates for positioning and phi and theta for lighting.
+    * color
+      * This is a basic tuple representing an RGB color
+    * x_offset & y_offset
+      * This just shifts the position of the center of the shape on the x and y axis respectively.
 * Post processing of luminance
   * After calculating the luminance, before rendering we normalize the value so instead of ranging from -1.5 to 1.5, it instead ranges from 0 - 255.
 * Sorted torus

@@ -88,6 +88,19 @@ def rotate_points(points: list[list[float]], angle_a: [float], angle_b: [float])
     return output
 
 
+def render_shape(shape: list[list[float]], color: tuple[int, int, int], x_offset: int, y_offset: int) -> None:
+    sorted_shape = sorted(shape, key=lambda item: item[2], reverse=True)
+    for point in sorted_shape:
+        x, y, z, luminance = point
+        x = K1 * x / K2 + z
+        y = K1 * y / K2 + z
+        luminance += 1.5
+        r = luminance * (color[0] / 3)
+        g = luminance * (color[1] / 3)
+        b = luminance * (color[2] / 3)
+        pygame.draw.rect(win, (r, g, b), (x + x_offset, y + y_offset, PIXEL_SIZE, PIXEL_SIZE))
+
+
 torus: list[list[float]] = generate_torus(R1, R2)
 while running:
     pygame.time.Clock().tick(FPS)
@@ -116,22 +129,14 @@ while running:
         #     color_counter = 0
         #     color_index += 1
         #     if color_index > len(colors) - 1:
-        #         print("done!")
-        #         animated = False
         #         color_index = 0
         #     COLOR = colors[color_index]
 
     rotated_torus = rotate_points(torus, angleA, angleB)
-    sorted_torus = sorted(rotated_torus, key=lambda item: item[2], reverse=True)
-    for point in sorted_torus:
-        x, y, z, luminance = point
-        x = K1 * x / K2 + z
-        y = K1 * y / K2 + z
-        luminance += 1.5
-        r = luminance * (COLOR[0] / 3)
-        g = luminance * (COLOR[1] / 3)
-        b = luminance * (COLOR[2] / 3)
-        pygame.draw.rect(win, (r, g, b), (x + 400, y + 400, PIXEL_SIZE, PIXEL_SIZE))
+    render_shape(rotated_torus, COLOR, 400, 400)
+
+    # rotated_donut = rotate_points(donut, angleA, angleB)
+    # render_shape(rotated_donut, COLOR, 400, 400)
 
     # DISPLAY UPDATE
     pygame.display.update()
