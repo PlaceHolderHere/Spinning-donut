@@ -133,7 +133,7 @@ while running:
 
     rotated_torus = rotate_points(torus, angleA, angleB)
     rotated_rect = rotate_points(rect, angleA, angleB)
-    render_frame(rotated_torus)
+    render_frame(rotated_torus, rotated_rect)
 
     # DISPLAY UPDATE
     pygame.display.update()
