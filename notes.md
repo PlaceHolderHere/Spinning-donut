@@ -2,9 +2,9 @@
 * Framebuffer - a bitmap that contains all the data for the pixels to be rendered on screen
 * Z-Buffer - data buffer for storing depth information for 3d objects
 - helps to prevent draw points that are behind another point
-* Z' - distance from eye to screen
-- renamed to K1
-* (x', y') - corresponding 2d position of 3d point
+* Z' - distance of the eye/camera to the screen
+  - renamed to K1
+* (x', y') - corresponding 2d coordinates of a 3d point projected onto a screen
 * R1 - radius of inner circle
 * R2 - radius of donut/torus
 * θ - Theta represents the current angle used to drawing the 2d circle
