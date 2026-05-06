@@ -59,6 +59,30 @@ def generate_torus() -> list[Point]:
     return output
 
 
+def generate_donut() -> list[Point]:
+    phi: float = 0
+    phi_increment: float = 0.03
+    theta_increment: float = 0.1
+    output: list[Point] = []
+
+    while phi <= math.pi * 2:
+        theta: float = 0
+        cos_phi: float = math.cos(phi)
+        sin_phi: float = math.sin(phi)
+        while theta <= math.pi * 2:
+            cos_theta: float = math.cos(theta)
+
+            x = (R2 + R1 * cos_theta) * cos_phi
+            y = R1 * math.sin(theta)
+            z = -((R2 + R1 * cos_theta) * sin_phi)
+
+            color = (245, 222, 179) if y > -0.5 else (230, 172, 195)
+            output.append(Point(x, y, z, theta, phi, 0, color))
+            theta += theta_increment
+        phi += phi_increment
+    return output
+
+
 def rotate_point(point: Point, angle_x: float, angle_y: float, angle_z: float) -> Point:
     # Rotating the Point
     sinx: float = math.sin(angle_x)
@@ -98,8 +122,11 @@ def render_shape(shape: list[Point], x_offset: int, y_offset: int) -> None:
         y = point.y * K1 / K2 + point.z
         luminance = point.luminance + 1.5
         r = luminance * (point.color[0] / 3)
+        # r = max(0, min(230, luminance * (point.color[0] / 3)))
         g = luminance * (point.color[1] / 3)
+        # g = max(0, min(230, luminance * (point.color[1] / 3)))
         b = luminance * (point.color[2] / 3)
+        # b = max(0, min(230, luminance * (point.color[2] / 3)))
         pygame.draw.rect(win, (r, g, b), (x + x_offset, y + y_offset, PIXEL_SIZE, PIXEL_SIZE))
 
 
@@ -112,7 +139,7 @@ def main():
     angle_z: float = 0
     animated: bool = False
 
-    torus: list[Point] = generate_torus()
+    torus: list[Point] = generate_donut()
     while running:
         pygame.time.Clock().tick(FPS)
         for event in pygame.event.get():
