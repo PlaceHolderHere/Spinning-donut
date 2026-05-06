@@ -4,139 +4,143 @@ import pygame
 # Constants
 SCREEN_HEIGHT: int = 800
 SCREEN_WIDTH: int = 800
-FPS: int = 30
+FPS: int = 60
 PIXEL_SIZE: int = 10
 K1: float = 15
 K2: float = 1
 R1: float = 5
 R2: float = 10
-A_SPACING: float = 0.1
-B_SPACING: float = 0.1
-COLOR: tuple[int, int, int] = (148, 87, 235)
-# color_counter = 0
-# color_index = 0
-# colors = [
-#     (255, 182, 193),
-#     (255, 209, 180),
-#     (255, 179, 128),
-#     (253, 253, 150),
-#     (119, 221, 119),
-#     (189, 252, 201),
-#     (174, 229, 238),
-#     (174, 198, 207),
-#     (230, 190, 255),
-#     (200, 162, 200),
-#     (179, 158, 181),
-#     (255, 160, 122),
-#     (245, 245, 220),
-#     (207, 207, 207),
-#     (255, 192, 203)
-# ]
-# COLOR = colors[color_index]
+ANGLE_X_SPACING: float = 0.05
+ANGLE_Y_SPACING: float = 0.05
+ANGLE_Z_SPACING: float = 0.05
+COLOR: tuple[int, int, int] = (110, 134, 73)
 
 # Pygame Init
 pygame.init()
 win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Variables
-running: bool = True
-angleA: float = 0
-angleB: float = 0
-animated: bool = False
+# Experimental, assuming I choose to use this for performance and to round off x' and y'
+# z_buffer: {(int, int): bool} = {}
 
 
-def generate_torus(r1: float, r2: float) -> list[list[float]]:
-    phi: int = 0
-    phi_spacing: float = 0.03
-    theta_spacing: float = 0.1
-    output: list = []
+# Classes
+class Point:
+    def __init__(self, x, y, z, theta, phi, luminance):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.theta = theta
+        self.phi = phi
+        self.luminance = luminance
+
+
+# Functions
+def generate_torus() -> list[Point]:
+    phi: float = 0
+    phi_increment: float = 0.03
+    theta_increment: float = 0.1
+    output: list[Point] = []
+
     while phi <= math.pi * 2:
-        theta: int = 0
+        theta: float = 0
+        cos_phi: float = math.cos(phi)
+        sin_phi: float = math.sin(phi)
         while theta <= math.pi * 2:
-            output.append([
-                (r2 + r1 * math.cos(theta)) * math.cos(phi),
-                r1 * math.sin(theta),
-                -(r2 + r1 * math.cos(theta)) * math.sin(phi),
-                theta,
-                phi])
-            theta += theta_spacing
-        phi += phi_spacing
+            cos_theta: float = math.cos(theta)
+
+            x = (R2 + R1 * cos_theta) * cos_phi
+            y = R1 * math.sin(theta)
+            z = -((R2 + R1 * cos_theta) * sin_phi)
+
+            output.append(Point(x, y, z, theta, phi, 0))
+            theta += theta_increment
+        phi += phi_increment
     return output
 
 
-def rotate_point(point: list[float], angle_a: float, angle_b: float) -> list[float]:
-    x, y, z, theta, phi = point
-    sinA = math.sin(angle_a)
-    cosA = math.cos(angle_a)
-    sinB = math.sin(angle_b)
-    cosB = math.cos(angle_b)
-    sinPhi = math.sin(phi)
-    cosPhi = math.cos(phi)
-    sinTheta = math.sin(theta)
-    cosTheta = math.cos(theta)
-    return [x * cosB - sinB * (y * cosA - z * sinA),
-            x * sinB + cosB * (y * cosA - z * sinA),
-            y * sinA + z * cosA,
-            (cosPhi * cosTheta * sinB) - (cosA * cosTheta * sinPhi) - (sinA * sinTheta) + (
-            cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi))]
+def rotate_point(point: Point, angle_x: float, angle_y: float, angle_z: float) -> Point:
+    # Rotating the Point
+    sinx: float = math.sin(angle_x)
+    siny: float = math.sin(angle_y)
+    sinz: float = math.sin(angle_z)
+    cosx: float = math.cos(angle_x)
+    cosy: float = math.cos(angle_y)
+    cosz: float = math.cos(angle_z)
+
+    x: float = point.x * cosz - (point.y * cosx - point.z * sinx) * sinz
+    y: float = cosz * (point.y * cosx - point.z * sinx) + point.x * sinz
+    z: float = point.z * cosx + point.y * sinx
+
+    # Updating the luminance
+    sin_theta: float = math.sin(point.theta)
+    sin_phi: float = math.sin(point.phi)
+    cos_theta: float = math.cos(point.theta)
+    cos_phi: float = math.cos(point.phi)
+
+    luminance: float = (cos_phi * cos_theta * sinz) - (cosx * cos_theta * sin_phi) - (sinx * sin_theta) + (
+                cosz * (cosx * sin_theta - cos_theta * sinx * sin_phi))
+
+    return Point(x, y, z, point.theta, point.phi, luminance)
 
 
-def rotate_points(points: list[list[float]], angle_a: [float], angle_b: [float]) -> list[list[float]]:
+def rotate_points(points: list[Point], angle_x: float, angle_y: float, angle_z: float) -> list[Point]:
     output = []
     for point in points:
-        output.append(rotate_point(point, angle_a, angle_b))
+        output.append(rotate_point(point, angle_x, angle_y, angle_z))
     return output
 
 
-def render_shape(shape: list[list[float]], color: tuple[int, int, int], x_offset: int, y_offset: int) -> None:
-    sorted_shape = sorted(shape, key=lambda item: item[2], reverse=True)
+def render_shape(shape: list[Point], color: tuple[int, int, int], x_offset: int, y_offset: int) -> None:
+    sorted_shape = sorted(shape, key=lambda x: x.z, reverse=True)
     for point in sorted_shape:
-        x, y, z, luminance = point
-        x = K1 * x / K2 + z
-        y = K1 * y / K2 + z
-        luminance += 1.5
+        x = point.x * K1 / K2 + point.z
+        y = point.y * K1 / K2 + point.z
+        luminance = point.luminance + 1.5
         r = luminance * (color[0] / 3)
         g = luminance * (color[1] / 3)
         b = luminance * (color[2] / 3)
         pygame.draw.rect(win, (r, g, b), (x + x_offset, y + y_offset, PIXEL_SIZE, PIXEL_SIZE))
 
 
-torus: list[list[float]] = generate_torus(R1, R2)
-while running:
-    pygame.time.Clock().tick(FPS)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+# Main
+def main():
+    # Variables
+    running: bool = True
+    angle_x: float = 0
+    angle_y: float = 0
+    angle_z: float = 0
+    animated: bool = False
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                animated = not animated
+    torus: list[Point] = generate_torus()
+    while running:
+        pygame.time.Clock().tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-    # WIN FILL
-    win.fill((0, 0, 0))
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    animated = not animated
 
-    # ROTATE ANGLE A & B
-    if animated:
-        angleA += A_SPACING
-        angleB += B_SPACING
-        if angleA > 2 * math.pi:
-            angleA = 0
-        if angleB > 2 * math.pi:
-            angleB = 0
+        # WIN FILL
+        win.fill((0, 0, 0))
 
-        # color_counter += 1
-        # if color_counter > 10:
-        #     color_counter = 0
-        #     color_index += 1
-        #     if color_index > len(colors) - 1:
-        #         color_index = 0
-        #     COLOR = colors[color_index]
+        # ROTATE ANGLE A & B
+        if animated:
+            angle_x += ANGLE_X_SPACING
+            angle_y += ANGLE_Y_SPACING
+            angle_z += ANGLE_Z_SPACING
 
-    rotated_torus = rotate_points(torus, angleA, angleB)
-    render_shape(rotated_torus, COLOR, 400, 400)
+            angle_x = angle_x if angle_x <= 360 else 0
+            angle_y = angle_y if angle_y <= 360 else 0
+            angle_z = angle_z if angle_z <= 360 else 0
 
-    # rotated_donut = rotate_points(donut, angleA, angleB)
-    # render_shape(rotated_donut, COLOR, 400, 400)
+        rotated_torus = rotate_points(torus, angle_x, angle_y, angle_z)
+        render_shape(rotated_torus, COLOR, 400, 400)
 
-    # DISPLAY UPDATE
-    pygame.display.update()
+        # DISPLAY UPDATE
+        pygame.display.update()
+
+
+if __name__ == "__main__":
+    main()
