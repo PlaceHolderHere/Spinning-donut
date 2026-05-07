@@ -64,6 +64,7 @@ def generate_donut() -> list[Point]:
     phi_increment: float = 0.03
     theta_increment: float = 0.1
     output: list[Point] = []
+    max_y = R1 // 1.2
 
     while phi <= math.pi * 2:
         theta: float = 0
@@ -77,7 +78,7 @@ def generate_donut() -> list[Point]:
             z = -((R2 + R1 * cos_theta) * sin_phi)
 
             color = (245, 222, 179) if y > -0.5 else (230, 172, 195)
-            output.append(Point(x, y, z, theta, phi, 0, color))
+            output.append(Point(x, max(-max_y, min(max_y, y)), z, theta, phi, 0, color))
             theta += theta_increment
         phi += phi_increment
     return output
@@ -122,11 +123,11 @@ def render_shape(shape: list[Point], x_offset: int, y_offset: int) -> None:
         y = point.y * K1 / K2 + point.z
         luminance = point.luminance + 1.5
         r = luminance * (point.color[0] / 3)
-        # r = max(0, min(230, luminance * (point.color[0] / 3)))
+        # r = max(40, min(200, luminance * (point.color[0] / 3)))
         g = luminance * (point.color[1] / 3)
-        # g = max(0, min(230, luminance * (point.color[1] / 3)))
+        # g = max(40, min(200, luminance * (point.color[1] / 3)))
         b = luminance * (point.color[2] / 3)
-        # b = max(0, min(230, luminance * (point.color[2] / 3)))
+        # b = max(40, min(200, luminance * (point.color[2] / 3)))
         pygame.draw.rect(win, (r, g, b), (x + x_offset, y + y_offset, PIXEL_SIZE, PIXEL_SIZE))
 
 
